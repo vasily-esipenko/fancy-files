@@ -74,28 +74,42 @@ def app():
             try:
                 stop = int(input('На каком столбце закончить: '))
             except ValueError:
-                stop = len(config.table[0])
-            res_col = input('Записать результат вычислений в новый столбец справа? (y/n): ') == 'y'
+                stop = len(config.table[0])-1
             copy_table = input('Скопировать таблицу? (y/n): ') == 'y'
-            add(start, stop, res_col, copy_table)
+            add(start, stop, copy_table)
         if op == 'sub':
-            start = int(input('С какого столбца начать: '))
-            start = start if start else 1
-            res_col = input('Записать результат вычислений в новый столбец справа? (y/n): ') == 'y'
+            try:
+                start = int(input('С какого столбца начать: '))
+            except ValueError:
+                start = 0
+            try:
+                stop = int(input('На каком столбце закончить: '))
+            except ValueError:
+                stop = len(config.table[0])-1
             copy_table = input('Скопировать таблицу? (y/n): ') == 'y'
-            sub(start, res_col, copy_table)
+            sub(start, stop, copy_table)
         if op == 'mul':
-            start = int(input('С какого столбца начать: '))
-            start = start if start else 0
-            res_col = input('Записать результат вычислений в новый столбец справа? (y/n): ') == 'y'
+            try:
+                start = int(input('С какого столбца начать: '))
+            except ValueError:
+                start = 0
+            try:
+                stop = int(input('На каком столбце закончить: '))
+            except ValueError:
+                stop = len(config.table[0])-1
             copy_table = input('Скопировать таблицу? (y/n): ') == 'y'
-            mul(start, res_col, copy_table)
+            mul(start, stop, copy_table)
         if op == 'div':
-            start = int(input('С какого столбца начать: '))
-            start = start if start else 1
-            res_col = input('Записать результат вычислений в новый столбец справа? (y/n): ') == 'y'
+            try:
+                start = int(input('С какого столбца начать: '))
+            except ValueError:
+                start = 0
+            try:
+                stop = int(input('На каком столбце закончить: '))
+            except ValueError:
+                stop = len(config.table[0])-1
             copy_table = input('Скопировать таблицу? (y/n): ') == 'y'
-            div(start, res_col, copy_table)
+            div(start, stop, copy_table)
         op = input('Введите операцию: ')
 
 

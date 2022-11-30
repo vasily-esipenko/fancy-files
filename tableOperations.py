@@ -156,24 +156,16 @@ def print_table():
     print(tabulate(config.table))
 
 
-def add(start=0, stop=None, res_col=True, copy_table=False):
+def add(start=0, stop=len(config.table[0])-1, copy_table=False):
     newTable = config.table
-    print('nt', newTable)
-    stop = stop - 1 if stop is not None else len(newTable[0]) - 1
     s = [0]*len(newTable)
     if all(item_type(str(newTable[r][c])) in ['int', 'float', 'bool'] for r in range(len(newTable)) for c in
-           range(start, stop + 1)):
+           range(start, stop+1)):
         for r in range(len(newTable)):
-            print('r', r)
-            for c in range(start, stop + 1):
-                print('c', c)
+            for c in range(start, stop+1):
                 s[r] += newTable[r][c]
-                print('s', s)
         for r in range(len(newTable)):
-            if res_col:
-                newTable[r] += [s[r]]
-            else:
-                newTable[r][len(newTable[r]) - 1] = s[r]
+            newTable[r] += [s[r]]
         print(tabulate(newTable))
         if copy_table:
             config.copyTable = newTable
@@ -185,80 +177,67 @@ def add(start=0, stop=None, res_col=True, copy_table=False):
         print('Сложить столбцы нельзя')
 
 
-def sub(start=1, stop=None, res_col=True, copy_table=False):
-    start -= 1
-    stop = stop - 1 if stop is not None else len(config.table[0]) - 1
-    s = [config.table[0][i] for i in range(len(config.table[0]))]
-    if all(item_type(str(config.table[r][c])) in ['int', 'float', 'bool'] for r in range(len(config.table)) for c in
-           range(start, stop + 1)):
-        for r in range(len(config.table)):
-            start = 1 if start == 0 else start
-            for c in range(start, stop + 1):
-                s[r] -= config.table[r][c]
-        for r in range(len(config.table)):
-            if res_col:
-                config.table[r] += [s[r]]
-            else:
-                config.table[r][len(config.table[r]) - 1] = s[r]
-        print_table()
+def sub(start=0, stop=len(config.table[0])-1, copy_table=False):
+    newTable = config.table
+    s = [newTable[i][start] for i in range(len(newTable))]
+    if all(item_type(str(newTable[r][c])) in ['int', 'float', 'bool'] for r in range(len(newTable)) for c in
+           range(start, stop+1)):
+        for r in range(len(newTable)):
+            for c in range(start+1, stop+1):
+                s[r] -= newTable[r][c]
+        for r in range(len(newTable)):
+            newTable[r] += [s[r]]
+        print(tabulate(newTable))
         if copy_table:
+            config.copyTable = newTable
             copy()
         else:
+            config.table = newTable
             save()
-
     else:
         print('Вычесть столбцы нельзя')
 
 
-def mul(start=1, stop=None, res_col=True, copy_table=False):
-    start -= 1
-    stop = stop - 1 if stop is not None else len(config.table[0]) - 1
-    s = [1]*len(config.table)
-    if all(item_type(str(config.table[r][c])) in ['int', 'float', 'bool'] for r in range(len(config.table)) for c in
-           range(start, stop + 1)):
-        for r in range(len(config.table)):
-            for c in range(start, stop + 1):
-                s[r] *= config.table[r][c]
-        for r in range(len(config.table)):
-            if res_col:
-                config.table[r] += [s[r]]
-            else:
-                config.table[r][len(config.table[r]) - 1] = s[r]
-        print_table()
+def mul(start=0, stop=len(config.table[0])-1, copy_table=False):
+    newTable = config.table
+    s = [1]*len(newTable)
+    if all(item_type(str(newTable[r][c])) in ['int', 'float', 'bool'] for r in range(len(newTable)) for c in
+           range(start, stop+1)):
+        for r in range(len(newTable)):
+            for c in range(start, stop+1):
+                s[r] *= newTable[r][c]
+        for r in range(len(newTable)):
+            newTable[r] += [s[r]]
+        print(tabulate(newTable))
         if copy_table:
+            config.copyTable = newTable
             copy()
         else:
+            config.table = newTable
             save()
-
     else:
         print('Умножить столбцы нельзя')
 
 
-def div(start=1, stop=None, res_col=True, copy_table=False):
-    start -= 1
-    stop = stop - 1 if stop is not None else len(config.table[0]) - 1
-    s = [config.table[0][i] for i in range(len(config.table[0]))]
-    if all(item_type(str(config.table[r][c])) in ['int', 'float', 'bool'] for r in range(len(config.table)) for c in
-           range(start, stop + 1)):
-        for r in range(len(config.table)):
-            start = 1 if start == 0 else start
-            for c in range(start, stop + 1):
+def div(start=0, stop=len(config.table[0])-1, copy_table=False):
+    newTable = config.table
+    s = [newTable[i][start] for i in range(len(newTable))]
+    if all(item_type(str(newTable[r][c])) in ['int', 'float', 'bool'] for r in range(len(newTable)) for c in
+           range(start, stop+1)):
+        for r in range(len(newTable)):
+            for c in range(start+1, stop+1):
                 try:
-                    s[r] /= config.table[r][c]
+                    s[r] /= newTable[r][c]
                 except ZeroDivisionError:
                     pass
-        for r in range(len(config.table)):
-            if res_col:
-                config.table[r] += [s[r]]
-            else:
-                config.table[r][len(config.table[r]) - 1] = s[r]
-        print_table()
+        for r in range(len(newTable)):
+            newTable[r] += [s[r]]
+        print(tabulate(newTable))
         if copy_table:
+            config.copyTable = newTable
             copy()
         else:
+            config.table = newTable
             save()
-
     else:
         print('Поделить столбцы нельзя')
-
-# add()
