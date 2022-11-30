@@ -6,8 +6,9 @@ def app():
     config.fileName = input('Введите имя файла: ')
     config.fileType = input('Введите тип файла: ')
     config.pickleTableType = input('Тип огранизации данных (list/dict): ') if config.fileType == 'pickle' else ''
+    config.txtDelimiter = input('Введите разделитель: ') if config.fileType == 'txt' else ''
     load()
-    print(tabulate(config.table))
+    print_table()
     op = input('Введите операцию: ')
     while op != 'exit':
         if op == 'save':
@@ -30,7 +31,7 @@ def app():
             by_number = input('По номеру? (y/n): ') == 'y'
             get_column_types(by_number)
         if op == 'set_column_types':
-            types_dict = {}
+            types_dict = {0: ['str'], 1: ['str'], 2: ['str'], 3: ['str']}
             by_number = input('По номеру? (y/n): ') == 'y'
             set_column_types(types_dict, by_number)
         if op == 'get_values':
@@ -46,7 +47,7 @@ def app():
                 column = int(column)
             except ValueError:
                 pass
-            get_values(column)
+            get_value(column)
         if op == 'set_values':
             column = input('Введите номер столбца: ')
             values = input('Введите значения для столбца (через пробел): ').split()
@@ -66,22 +67,35 @@ def app():
                 pass
             set_value(value, column)
         if op == 'add':
+            try:
+                start = int(input('С какого столбца начать: '))
+            except ValueError:
+                start = 0
+            try:
+                stop = int(input('На каком столбце закончить: '))
+            except ValueError:
+                stop = len(config.table[0])
             res_col = input('Записать результат вычислений в новый столбец справа? (y/n): ') == 'y'
             copy_table = input('Скопировать таблицу? (y/n): ') == 'y'
-            add(res_col, copy_table)
+            add(start, stop, res_col, copy_table)
         if op == 'sub':
+            start = int(input('С какого столбца начать: '))
+            start = start if start else 1
             res_col = input('Записать результат вычислений в новый столбец справа? (y/n): ') == 'y'
             copy_table = input('Скопировать таблицу? (y/n): ') == 'y'
-            sub(res_col, copy_table)
+            sub(start, res_col, copy_table)
         if op == 'mul':
+            start = int(input('С какого столбца начать: '))
+            start = start if start else 0
             res_col = input('Записать результат вычислений в новый столбец справа? (y/n): ') == 'y'
             copy_table = input('Скопировать таблицу? (y/n): ') == 'y'
-            mul(res_col, copy_table)
+            mul(start, res_col, copy_table)
         if op == 'div':
+            start = int(input('С какого столбца начать: '))
+            start = start if start else 1
             res_col = input('Записать результат вычислений в новый столбец справа? (y/n): ') == 'y'
             copy_table = input('Скопировать таблицу? (y/n): ') == 'y'
-            div(res_col, copy_table)
-        print(tabulate(config.table))
+            div(start, res_col, copy_table)
         op = input('Введите операцию: ')
 
 

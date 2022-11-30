@@ -35,7 +35,6 @@ def copy():
 
 # номер строки, начиная с 1 (и до строки с номером stop включительно)
 def get_rows_by_number(start=1, stop=None, copy_table=False):
-    print(config.table)
     newTable = config.table[start - 1:stop] if stop is not None else config.table[start - 1:]
     print(tabulate(newTable))
     if copy_table:
@@ -47,7 +46,6 @@ def get_rows_by_number(start=1, stop=None, copy_table=False):
 
 
 def get_rows_by_index(*vals, copy_table=False):
-    print(config.table)
     newTable = []
     for i in vals:
         for r in range(len(config.table)):
@@ -73,7 +71,7 @@ def get_column_types(by_number=True):
         types_dict = {config.table[0][i]: [] for i in range(len(config.table[0]))}
         for r in range(1, len(config.table)):
             for c in range(len(config.table[r])):
-                types_dict[config.table[0][c]] += [item_type(config.table[r][c])]
+                types_dict[config.table[0][c]] += [item_type(str(config.table[r][c]))]
     print(types_dict)
 
 
@@ -114,8 +112,10 @@ def get_value(column=0):
     if len(config.table) == 1:
         if isinstance(column, int):
             print(config.table[0][column])
-        print(config.table[0][config.table.index(column)])
-    return get_values(column)
+        else:
+            print(config.table[0][config.table.index(column)])
+    else:
+        print('В таблице больше одной строки. Используйте get_values()')
 
 
 def set_values(values, column=0):
@@ -140,88 +140,125 @@ def set_values(values, column=0):
 
 
 def set_value(value, column=0):
-    if len(config.table) == 1:
+    try:
         if isinstance(column, int):
-            config.table[0][column] = value
+            config.table[column] = value
             print_table()
             return save()
         else:
             config.table[0][config.table[0].index(column)] = value
             return save()
-    print('Таблица содержит больше одной строки. Используйте метод set_values')
+    except:
+        print('Таблица содержит больше одной строки. Используйте метод set_values')
 
 
 def print_table():
     print(tabulate(config.table))
 
 
-def add(start=1, stop=None, res_col=True, copy_table=False):
-    start -= 1
-    stop = stop - 1 if stop is not None else len(config.table) - 1
-    s = [0 for i in range(len(config.table))]
-    if all(item_type(str(config.table[r][c])) in ['int', 'float', 'bool'] for r in range(len(config.table)) for c in
+def add(start=0, stop=None, res_col=True, copy_table=False):
+    newTable = config.table
+    print('nt', newTable)
+    stop = stop - 1 if stop is not None else len(newTable[0]) - 1
+    s = [0]*len(newTable)
+    if all(item_type(str(newTable[r][c])) in ['int', 'float', 'bool'] for r in range(len(newTable)) for c in
            range(start, stop + 1)):
-        for r in range(len(config.table)):
+        for r in range(len(newTable)):
+            print('r', r)
             for c in range(start, stop + 1):
-                s[r] += config.table[r][c]
-        finalize_arithm_op(s, res_col, copy_table)
+                print('c', c)
+                s[r] += newTable[r][c]
+                print('s', s)
+        for r in range(len(newTable)):
+            if res_col:
+                newTable[r] += [s[r]]
+            else:
+                newTable[r][len(newTable[r]) - 1] = s[r]
+        print(tabulate(newTable))
+        if copy_table:
+            config.copyTable = newTable
+            copy()
+        else:
+            config.table = newTable
+            save()
     else:
         print('Сложить столбцы нельзя')
 
 
 def sub(start=1, stop=None, res_col=True, copy_table=False):
     start -= 1
-    stop = stop - 1 if stop is not None else len(config.table) - 1
+    stop = stop - 1 if stop is not None else len(config.table[0]) - 1
     s = [config.table[0][i] for i in range(len(config.table[0]))]
     if all(item_type(str(config.table[r][c])) in ['int', 'float', 'bool'] for r in range(len(config.table)) for c in
            range(start, stop + 1)):
-        for r in range(1, len(config.table)):
+        for r in range(len(config.table)):
+            start = 1 if start == 0 else start
             for c in range(start, stop + 1):
                 s[r] -= config.table[r][c]
-        finalize_arithm_op(s, res_col, copy_table)
+        for r in range(len(config.table)):
+            if res_col:
+                config.table[r] += [s[r]]
+            else:
+                config.table[r][len(config.table[r]) - 1] = s[r]
+        print_table()
+        if copy_table:
+            copy()
+        else:
+            save()
+
     else:
         print('Вычесть столбцы нельзя')
 
 
 def mul(start=1, stop=None, res_col=True, copy_table=False):
     start -= 1
-    stop = stop - 1 if stop is not None else len(config.table) - 1
-    s = [1 for i in range(len(config.table))]
+    stop = stop - 1 if stop is not None else len(config.table[0]) - 1
+    s = [1]*len(config.table)
     if all(item_type(str(config.table[r][c])) in ['int', 'float', 'bool'] for r in range(len(config.table)) for c in
            range(start, stop + 1)):
         for r in range(len(config.table)):
             for c in range(start, stop + 1):
                 s[r] *= config.table[r][c]
-        finalize_arithm_op(s, res_col, copy_table)
+        for r in range(len(config.table)):
+            if res_col:
+                config.table[r] += [s[r]]
+            else:
+                config.table[r][len(config.table[r]) - 1] = s[r]
+        print_table()
+        if copy_table:
+            copy()
+        else:
+            save()
+
     else:
         print('Умножить столбцы нельзя')
 
 
 def div(start=1, stop=None, res_col=True, copy_table=False):
     start -= 1
-    stop = stop - 1 if stop is not None else len(config.table) - 1
+    stop = stop - 1 if stop is not None else len(config.table[0]) - 1
     s = [config.table[0][i] for i in range(len(config.table[0]))]
     if all(item_type(str(config.table[r][c])) in ['int', 'float', 'bool'] for r in range(len(config.table)) for c in
            range(start, stop + 1)):
-        for r in range(1, len(config.table)):
+        for r in range(len(config.table)):
+            start = 1 if start == 0 else start
             for c in range(start, stop + 1):
                 try:
                     s[r] /= config.table[r][c]
                 except ZeroDivisionError:
                     pass
-        finalize_arithm_op(s, res_col, copy_table)
+        for r in range(len(config.table)):
+            if res_col:
+                config.table[r] += [s[r]]
+            else:
+                config.table[r][len(config.table[r]) - 1] = s[r]
+        print_table()
+        if copy_table:
+            copy()
+        else:
+            save()
+
     else:
         print('Поделить столбцы нельзя')
 
-
-def finalize_arithm_op(s, res_col=True, copy_table=False):
-    for r in range(len(config.table)):
-        if res_col:
-            config.table[r] += [s[r]]
-        else:
-            config.table[r][len(config.table[r]) - 1] = s[r]
-    print_table()
-    if copy_table:
-        copy()
-    else:
-        save()
+# add()
